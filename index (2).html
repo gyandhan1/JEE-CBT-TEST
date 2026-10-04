@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEE Main CBT Mock Test - Class 11</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  .header { background: #1e3a8a; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 18px; }
+  .timer-box { background: #dc2626; color: white; padding: 6px 14px; border-radius: 4px; font-weight: bold; font-size: 16px; }
+  
+  .subject-bar { background: #e2e8f0; display: flex; border-bottom: 2px solid #cbd5e1; }
+  .sub-btn { padding: 10px 24px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 14px; color: #475569; }
+  .sub-btn.active { background: white; color: #1e3a8a; border-top: 3px solid #1e3a8a; }
+
+  .main-container { display: flex; flex: 1; overflow: hidden; }
+  .question-section { flex: 3; background: white; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto; }
+  .palette-section { flex: 1; background: #f8fafc; border-left: 1px solid #cbd5e1; padding: 15px; display: flex; flex-direction: column; }
+
+  .q-header { border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; font-weight: bold; color: #334155; }
+  .q-text { font-size: 16px; line-height: 1.6; color: #1e293b; margin-bottom: 20px; }
+  .opt-container { display: flex; flex-direction: column; gap: 12px; }
+  .opt-label { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+  .opt-label:hover { background: #f1f5f9; }
+  .opt-label input { transform: scale(1.2); }
+
+  .footer-bar { border-top: 1px solid #e2e8f0; padding-top: 15px; display: flex; justify-content: space-between; }
+  .btn { padding: 8px 18px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; }
+  .btn-save { background: #2563eb; color: white; }
+  .btn-review { background: #7c3aed; color: white; }
+  .btn-clear { background: #e2e8f0; color: #334155; }
+  .btn-submit { background: #16a34a; color: white; width: 100%; padding: 12px; margin-top: auto; }
+
+  .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; overflow-y: auto; max-height: calc(100vh - 250px); padding-right: 5px; margin-top: 10px; }
+  .pal-btn { height: 38px; border: 1px solid #cbd5e1; background: #ffffff; border-radius: 4px; font-weight: bold; cursor: pointer; }
+  .pal-btn.answered { background: #16a34a; color: white; border-color: #16a34a; }
+  .pal-btn.not-answered { background: #dc2626; color: white; border-color: #dc2626; }
+  .pal-btn.review { background: #7c3aed; color: white; border-color: #7c3aed; }
+  .pal-btn.active { border: 2px solid #0f172a; }
+
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 12px; }
+  .leg-item { display: flex; align-items: center; gap: 6px; }
+  .leg-box { width: 14px; height: 14px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>JEE (Main) Mock Test - Physics, Chemistry & Mathematics</h1>
+  <div class="timer-box" id="timer">Time Left: 180:00</div>
+</div>
+
+<div class="subject-bar">
+  <button class="sub-btn active" onclick="switchSubject('Physics')">Physics (Q1-25)</button>
+  <button class="sub-btn" onclick="switchSubject('Chemistry')">Chemistry (Q26-50)</button>
+  <button class="sub-btn" onclick="switchSubject('Maths')">Mathematics (Q51-75)</button>
+</div>
+
+<div class="main-container">
+  <div class="question-section">
+    <div>
+      <div class="q-header" id="q-header">Question 1 (Physics)</div>
+      <div class="q-text" id="q-text">Loading question...</div>
+      <div class="opt-container" id="opt-container"></div>
+    </div>
+    <div class="footer-bar">
+      <div>
+        <button class="btn btn-review" onclick="markReview()">Mark for Review & Next</button>
+        <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
+      </div>
+      <button class="btn btn-save" onclick="saveAndNext()">Save & Next</button>
+    </div>
+  </div>
+
+  <div class="palette-section">
+    <div class="legend">
+      <div class="leg-item"><div class="leg-box" style="background:#16a34a;"></div> Answered</div>
+      <div class="leg-item"><div class="leg-box" style="background:#dc2626;"></div> Not Answered</div>
+      <div class="leg-item"><div class="leg-box" style="background:#7c3aed;"></div> Marked Review</div>
+      <div class="leg-item"><div class="leg-box" style="background:#ffffff; border:1px solid #ccc;"></div> Not Visited</div>
+    </div>
+    <hr>
+    <div class="palette-grid" id="palette-grid"></div>
+    <button class="btn btn-submit" onclick="submitTest()">Final Submit</button>
+  </div>
+</div>
+
+<script>
+// 75 JEE MAIN QUESTIONS
+const questions = [
+  // --- PHYSICS (Q1 to Q25) ---
+  { q: "If vector A = 2i + 3j - k and vector B = -i + 3j + 4k, find the scalar product (A . B):", o: ["3", "5", "7", "9"], a: 0, s: "Physics" },
+  { q: "Find the derivative of f(x) = x³ * sin(x) with respect to x:", o: ["3x² sin(x) + x³ cos(x)", "3x² cos(x)", "x³ cos(x) - 3x² sin(x)", "3x² sin(x)"], a: 0, s: "Physics" },
+  { q: "Evaluate the integral: ∫ (3x² + 2x + 1) dx from 0 to 2:", o: ["12", "14", "16", "18"], a: 1, s: "Physics" },
+  { q: "Two vectors of equal magnitude P have a resultant equal to P. The angle between them is:", o: ["60°", "90°", "120°", "180°"], a: 2, s: "Physics" },
+  { q: "A particle moves along x-axis such that x(t) = 4t² - 16t + 8. The velocity becomes zero at t = :", o: ["1 s", "2 s", "3 s", "4 s"], a: 1, s: "Physics" },
+  { q: "A car accelerates uniformly from rest to 72 km/h in 10 s. The distance covered is:", o: ["50 m", "100 m", "150 m", "200 m"], a: 1, s: "Physics" },
+  { q: "A ball thrown vertically upwards reaches a max height H. Its velocity at height H/2 is (v0 = initial velocity):", o: ["v0 / 2", "v0 / √2", "v0 / 4", "√2 v0"], a: 1, s: "Physics" },
+  { q: "The displacement in the nth second of uniformly accelerated motion is proportional to:", o: ["n", "(2n - 1)", "n²", "(n² - 1)"], a: 1, s: "Physics" },
+  { q: "The angle between vector A = i + j and vector B = i - j is:", o: ["0°", "45°", "90°", "180°"], a: 2, s: "Physics" },
+  { q: "The slope of velocity-time (v-t) graph represents:", o: ["Displacement", "Acceleration", "Impulse", "Force"], a: 1, s: "Physics" },
+  { q: "If acceleration a = 2t + 1 m/s² and initial velocity is zero, velocity at t = 3s is:", o: ["9 m/s", "12 m/s", "15 m/s", "18 m/s"], a: 1, s: "Physics" },
+  { q: "A body dropped from height h hits ground with velocity v. To hit ground with 2v, it must be dropped from:", o: ["2h", "4h", "8h", "16h"], a: 1, s: "Physics" },
+  { q: "Magnitude of unit vector is:", o: ["0", "1", "-1", "Infinite"], a: 1, s: "Physics" },
+  { q: "The area under acceleration-time graph gives:", o: ["Distance", "Velocity", "Change in velocity", "Displacement"], a: 2, s: "Physics" },
+  { q: "If position x = A cos(ωt), maximum acceleration magnitude is:", o: ["ω A", "ω² A", "ω² A²", "A / ω"], a: 1, s: "Physics" },
+  { q: "Water drops fall at regular intervals from a tap 5m above ground. When 1st drop hits ground, 3rd drop is at height (g=10):", o: ["1.25 m", "2.5 m", "3.75 m", "4.0 m"], a: 2, s: "Physics" },
+  { q: "Ratio of distances traversed in 1st, 2nd, and 3rd seconds by freely falling body starting from rest:", o: ["1 : 2 : 3", "1 : 3 : 5", "1 : 4 : 9", "1 : 1 : 1"], a: 1, s: "Physics" },
+  { q: "If vector A + B = C and |A|² + |B|² = |C|², angle between A and B is:", o: ["0°", "45°", "90°", "180°"], a: 2, s: "Physics" },
+  { q: "A particle travels half total distance with speed v1 and remaining with speed v2. Average speed is:", o: ["(v1+v2)/2", "2v1v2/(v1+v2)", "√(v1v2)", "(v1+v2)/2v1v2"], a: 1, s: "Physics" },
+  { q: "Derivative of e^(3x) with respect to x is:", o: ["e^(3x)", "3 e^(3x)", "(1/3) e^(3x)", "3x e^(3x-1)"], a: 1, s: "Physics" },
+  { q: "The displacement x of a particle is given by √x = t + 3. The velocity is proportional to:", o: ["t", "t²", "√t", "t^(3/2)"], a: 0, s: "Physics" },
+  { q: "Maximum value of y = sin(x) + cos(x) is:", o: ["1", "2", "√2", "1/√2"], a: 2, s: "Physics" },
+  { q: "A train of length 150m moves with 20 m/s. Time taken to cross a bridge of 850m is:", o: ["30 s", "40 s", "50 s", "60 s"], a: 2, s: "Physics" },
+  { q: "For vectors A and B, if |A × B| = A . B, then angle between them is:", o: ["30°", "45°", "60°", "90°"], a: 1, s: "Physics" },
+  { q: "If velocity v = 5 - 2t m/s, total distance covered in first 4 seconds is:", o: ["6.25 m", "8.5 m", "10 m", "12.5 m"], a: 1, s: "Physics" },
+
+  // --- CHEMISTRY (Q26 to Q50) ---
+  { q: "The number of moles of solute present in 1 liter of solution is called:", o: ["Molality", "Molarity", "Normality", "Mole fraction"], a: 1, s: "Chemistry" },
+  { q: "How many atoms are present in 4.4 g of CO₂?", o: ["6.022 × 10²²", "1.806 × 10²³", "6.022 × 10²³", "1.204 × 10²³"], a: 1, s: "Chemistry" },
+  { q: "Volume occupied by 1 mole of an ideal gas at STP (1 atm, 273.15 K) is:", o: ["22.4 L", "22.7 L", "24.2 L", "20.4 L"], a: 0, s: "Chemistry" },
+  { q: "Element with atomic number 35 belongs to which block of the periodic table?", o: ["s-block", "p-block", "d-block", "f-block"], a: 1, s: "Chemistry" },
+  { q: "Which element possesses highest electronegativity on Pauling scale?", o: ["Oxygen (O)", "Chlorine (Cl)", "Fluorine (F)", "Nitrogen (N)"], a: 2, s: "Chemistry" },
+  { q: "Which of the following has highest negative electron gain enthalpy?", o: ["F", "Cl", "Br", "I"], a: 1, s: "Chemistry" },
+  { q: "The mass percentage of Carbon in methane (CH₄) is approximately:", o: ["50%", "60%", "75%", "80%"], a: 2, s: "Chemistry" },
+  { q: "Correct increasing order of first ionization enthalpy for B, C, N, O is:", o: ["B < C < O < N", "B < C < N < O", "C < B < N < O", "B < O < C < N"], a: 0, s: "Chemistry" },
+  { q: "Number of molecules present in 18 mg of water (H₂O) is:", o: ["6.022 × 10²³", "6.022 × 10²⁰", "6.022 × 10²¹", "3.011 × 10²¹"], a: 1, s: "Chemistry" },
+  { q: "Correct order of ionic radius for isoelectronic species: N³⁻, O²⁻, F⁻, Na⁺:", o: ["Na⁺ < F⁻ < O²⁻ < N³⁻", "N³⁻ < O²⁻ < F⁻ < Na⁺", "F⁻ < Na⁺ < O²⁻ < N³⁻", "Na⁺ > F⁻ > O²⁻ > N³⁻"], a: 0, s: "Chemistry" },
+  { q: "Empirical formula of a compound with 40% C, 6.7% H, and 53.3% O is:", o: ["CH₂O", "C₂H₄O", "CHO₂", "CH₄O"], a: 0, s: "Chemistry" },
+  { q: "Which group of elements are collectively called Chalcogens?", o: ["Group 15", "Group 16", "Group 17", "Group 18"], a: 1, s: "Chemistry" },
+  { q: "Total number of electrons in 1.6 g of CH₄ gas is:", o: ["6.022 × 10²²", "6.022 × 10²³", "1.6 × 10²³", "6.022 × 10²⁴"], a: 1, s: "Chemistry" },
+  { q: "General outer electronic configuration of d-block elements is:", o: ["(n-1)d¹⁻¹⁰ ns¹⁻²", "(n-1)d¹⁻¹⁰ ns²", "nd¹⁻¹⁰ ns¹", "(n-1)d¹⁻⁹ ns²"], a: 0, s: "Chemistry" },
+  { q: "Molality of a solution is independent of temperature because it involves:", o: ["Volume of solvent", "Mass of solvent", "Volume of solute", "Density"], a: 1, s: "Chemistry" },
+  { q: "Molarity of pure water (density = 1 g/mL) is:", o: ["18 M", "50 M", "55.55 M", "100 M"], a: 2, s: "Chemistry" },
+  { q: "An element has electronic configuration [Ar] 3d¹⁰ 4s² 4p³. Its group and period are:", o: ["Group 15, Period 4", "Group 13, Period 4", "Group 5, Period 4", "Group 15, Period 3"], a: 0, s: "Chemistry" },
+  { q: "Which of the following oxides is amphoteric in nature?", o: ["Na₂O", "SO₂", "Al₂O₃", "CaO"], a: 2, s: "Chemistry" },
+  { q: "How many grams of NaOH are needed to prepare 250 mL of 0.5 M solution?", o: ["5 g", "10 g", "2.5 g", "20 g"], a: 0, s: "Chemistry" },
+  { q: "Mass of one atom of Oxygen in grams is:", o: ["16 g", "2.65 × 10⁻²³ g", "1.66 × 10⁻²⁴ g", "9.1 × 10⁻³¹ g"], a: 1, s: "Chemistry" },
+  { q: "Screening effect / Shielding effect down a group generally:", o: ["Increases", "Decreases", "Remains constant", "Zero"], a: 0, s: "Chemistry" },
+  { q: "Number of gram atoms of Nitrogen in 28 g of N₂ gas is:", o: ["1", "2", "0.5", "14"], a: 1, s: "Chemistry" },
+  { q: "Which element has highest positive electron gain enthalpy?", o: ["Helium", "Neon", "Argon", "Krypton"], a: 1, s: "Chemistry" },
+  { q: "20 g of CaCO₃ on complete thermal decomposition produces how much CO₂ at STP?", o: ["2.24 L", "4.48 L", "22.4 L", "1.12 L"], a: 1, s: "Chemistry" },
+  { q: "Diagonal relationship is shown by which pair:", o: ["Li and Mg", "Be and Na", "B and Si", "Both A and C"], a: 3, s: "Chemistry" },
+
+  // --- MATHEMATICS (Q51 to Q75) ---
+  { q: "If A = {1, 2, 3, 4}, how many subsets does set A have?", o: ["8", "12", "16", "32"], a: 2, s: "Maths" },
+  { q: "The roots of the equation x² - 5x + 6 = 0 are:", o: ["2, 3", "-2, -3", "1, 6", "-1, -6"], a: 0, s: "Maths" },
+  { q: "If α and β are roots of ax² + bx + c = 0, then (α² + β²) equals:", o: ["(b² - 2ac)/a²", "(b² + 2ac)/a²", "(b - 2ac)/a", "b²/a²"], a: 0, s: "Maths" },
+  { q: "If A and B are two sets such that n(A) = 35, n(B) = 40, and n(A ∪ B) = 60, then n(A ∩ B) is:", o: ["10", "15", "20", "25"], a: 1, s: "Maths" },
+  { q: "For real and distinct roots of px² + 4x + 1 = 0, the condition on p is:", o: ["p < 4", "p > 4", "p ≤ 4", "p = 4"], a: 0, s: "Maths" },
+  { q: "If set A has n elements, total number of proper subsets is:", o: ["2ⁿ", "2ⁿ - 1", "2ⁿ - 2", "2ⁿ⁺¹"], a: 1, s: "Maths" },
+  { q: "If roots of (k - 2)x² + 8x + (k + 4) = 0 are reciprocal of each other, then k equals:", o: ["-6", "6", "2", "No solution"], a: 3, s: "Maths" },
+  { q: "The set {x : x is a real number and x² + 1 = 0} is an example of:", o: ["Universal set", "Singleton set", "Empty/Null set", "Infinite set"], a: 2, s: "Maths" },
+  { q: "Minimum value of the quadratic expression 2x² - 4x + 5 for real x is:", o: ["1", "2", "3", "5"], a: 2, s: "Maths" },
+  { q: "If A = {x : x is a prime number < 10}, then n(P(A)) is:", o: ["8", "16", "32", "64"], a: 1, s: "Maths" },
+  { q: "Condition for ax² + bx + c > 0 for all real x is:", o: ["a > 0, D < 0", "a > 0, D > 0", "a < 0, D < 0", "a < 0, D > 0"], a: 0, s: "Maths" },
+  { q: "Set (A - B) is mathematically equivalent to:", o: ["A ∩ B'", "A' ∩ B", "A ∪ B'", "A' ∪ B"], a: 0, s: "Maths" },
+  { q: "If one root of x² - px + 8 = 0 is 4, then value of p is:", o: ["4", "6", "8", "2"], a: 1, s: "Maths" },
+  { q: "If A ∩ B = A, then which of the following is true:", o: ["A ⊆ B", "B ⊆ A", "A = ∅", "B = ∅"], a: 0, s: "Maths" },
+  { q: "Product of real roots of equation x² - 5|x| + 6 = 0 is:", o: ["6", "36", "-36", "-6"], a: 1, s: "Maths" },
+  { q: "If n(A) = 3 and n(B) = 2, total number of elements in A × B is:", o: ["5", "6", "8", "9"], a: 1, s: "Maths" },
+  { q: "Equation whose roots are negative of roots of ax² + bx + c = 0 is:", o: ["ax² - bx + c = 0", "ax² + bx - c = 0", "-ax² + bx + c = 0", "cx² + bx + a = 0"], a: 0, s: "Maths" },
+  { q: "Number of elements in power set of empty set P(∅) is:", o: ["0", "1", "2", "Infinite"], a: 1, s: "Maths" },
+  { q: "Sum of roots of (x - 2)² - 3(x - 2) + 2 = 0 is:", o: ["3", "5", "7", "9"], a: 2, s: "Maths" },
+  { q: "Two finite sets have m and n elements. Total subsets of first is 56 more than second. Values of m and n are:", o: ["7, 6", "6, 3", "5, 1", "8, 7"], a: 1, s: "Maths" },
+  { q: "If roots of x² - bx + c = 0 are two consecutive integers, then b² - 4c equals:", o: ["0", "1", "2", "-1"], a: 1, s: "Maths" },
+  { q: "By De Morgan's Law, (A ∪ B)' is equal to:", o: ["A' ∪ B'", "A' ∩ B'", "A ∩ B", "A' - B'"], a: 1, s: "Maths" },
+  { q: "If α, β are roots of x² - 2x + 4 = 0, value of α³ + β³ is:", o: ["-16", "16", "8", "-8"], a: 0, s: "Maths" },
+  { q: "Symmetric difference of sets A and B, denoted by A Δ B, is:", o: ["(A - B) ∩ (B - A)", "(A - B) ∪ (B - A)", "(A ∪ B) - (A ∪ B)", "A ∩ B"], a: 1, s: "Maths" },
+  { q: "Number of real solutions of the equation e^x - x - 1 = 0 is:", o: ["0", "1", "2", "Infinitely many"], a: 1, s: "Maths" }
+];
+
+let curQ = 0;
+let userAnswers = new Array(75).fill(null);
+let status = new Array(75).fill("not-visited"); // answered, not-answered, review, not-visited
+
+function loadQ(idx) {
+  curQ = idx;
+  if (status[curQ] === "not-visited") status[curQ] = "not-answered";
+  
+  document.getElementById("q-header").innerText = `Question ${curQ + 1} (${questions[curQ].s})`;
+  document.getElementById("q-text").innerText = questions[curQ].q;
+
+  let optHtml = "";
+  questions[curQ].o.forEach((opt, i) => {
+    let checked = userAnswers[curQ] === i ? "checked" : "";
+    optHtml += `
+      <label class="opt-label">
+        <input type="radio" name="opt" value="${i}" ${checked} onchange="setAnswer(${i})">
+        <span><b>(${String.fromCharCode(65 + i)})</b> ${opt}</span>
+      </label>`;
+  });
+  document.getElementById("opt-container").innerHTML = optHtml;
+
+  highlightSubjectTab(questions[curQ].s);
+  renderPalette();
+}
+
+function setAnswer(ans) {
+  userAnswers[curQ] = ans;
+}
+
+function saveAndNext() {
+  if (userAnswers[curQ] !== null) {
+    status[curQ] = "answered";
+  } else {
+    status[curQ] = "not-answered";
+  }
+  if (curQ < 74) loadQ(curQ + 1);
+  else renderPalette();
+}
+
+function markReview() {
+  status[curQ] = "review";
+  if (curQ < 74) loadQ(curQ + 1);
+  else renderPalette();
+}
+
+function clearResponse() {
+  userAnswers[curQ] = null;
+  status[curQ] = "not-answered";
+  loadQ(curQ);
+}
+
+function switchSubject(sub) {
+  let startIdx = sub === "Physics" ? 0 : sub === "Chemistry" ? 25 : 50;
+  loadQ(startIdx);
+}
+
+function highlightSubjectTab(sub) {
+  let tabs = document.querySelectorAll(".sub-btn");
+  tabs.forEach(t => t.classList.remove("active"));
+  if (sub === "Physics") tabs[0].classList.add("active");
+  else if (sub === "Chemistry") tabs[1].classList.add("active");
+  else tabs[2].classList.add("active");
+}
+
+function renderPalette() {
+  let grid = document.getElementById("palette-grid");
+  let html = "";
+  questions.forEach((_, i) => {
+    let cls = status[i];
+    if (i === curQ) cls += " active";
+    html += `<button class="pal-btn ${cls}" onclick="loadQ(${i})">${i + 1}</button>`;
+  });
+  grid.innerHTML = html;
+}
+
+function submitTest() {
+  let totalScore = 0, correct = 0, incorrect = 0, unattempted = 0;
+  questions.forEach((q, i) => {
+    if (userAnswers[i] === null) {
+      unattempted++;
+    } else if (userAnswers[i] === q.a) {
+      correct++;
+      totalScore += 4;
+    } else {
+      incorrect++;
+      totalScore -= 1;
+    }
+  });
+
+  alert(
+    `=== JEE MAIN TEST RESULT ===\n` +
+    `Total Questions: 75\n` +
+    `Correct: ${correct}\n` +
+    `Incorrect: ${incorrect}\n` +
+    `Unattempted: ${unattempted}\n\n` +
+    `Final Score: ${totalScore} / 300`
+  );
+}
+
+// 180 Minutes Countdown Timer
+let timeLeft = 180 * 60;
+setInterval(() => {
+  if (timeLeft <= 0) { submitTest(); return; }
+  timeLeft--;
+  let h = Math.floor(timeLeft / 3600);
+  let m = Math.floor((timeLeft % 3600) / 60);
+  let s = timeLeft % 60;
+  document.getElementById("timer").innerText = 
+    `Time Left: ${h > 0 ? h + ':' : ''}${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}, 1000);
+
+loadQ(0);
+</script>
+</body>
+</html>
